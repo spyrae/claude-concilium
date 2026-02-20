@@ -68,6 +68,17 @@ cd claude-concilium
 cd servers/mcp-openai && npm install && cd ../..
 cd servers/mcp-gemini && npm install && cd ../..
 cd servers/mcp-qwen && npm install && cd ../..
+
+# Verify all servers work (no CLI tools required)
+node test/smoke-test.mjs
+```
+
+Expected output:
+```
+PASS mcp-openai  (Tools: openai_chat, openai_review)
+PASS mcp-gemini  (Tools: gemini_chat, gemini_analyze)
+PASS mcp-qwen    (Tools: qwen_chat)
+All tests passed.
 ```
 
 ### 2. Set up providers
