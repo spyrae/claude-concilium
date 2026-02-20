@@ -1,0 +1,24 @@
+{
+  "name": "@claude-concilium/mcp-openai",
+  "version": "1.0.0",
+  "description": "MCP server wrapping OpenAI Codex CLI for non-interactive API calls with error detection",
+  "main": "server.js",
+  "bin": {
+    "mcp-openai": "./server.js"
+  },
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spyrae/claude-concilium",
+    "directory": "servers/mcp-openai"
+  },
+  "keywords": ["mcp", "openai", "codex", "claude-code", "ai-concilium"],
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "zod": "^3.25.76"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "mcp-openai": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/path/to/claude-concilium/servers/mcp-openai/server.js"],
+      "env": {
+        "CODEX_HOME": "~/.codex-minimal"
+      }
+    },
+    "mcp-gemini": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/path/to/claude-concilium/servers/mcp-gemini/server.js"]
+    },
+    "mcp-qwen": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/path/to/claude-concilium/servers/mcp-qwen/server.js"]
+    },
+    "deepseek": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "deepseek-mcp-server"],
+      "env": {
+        "DEEPSEEK_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}

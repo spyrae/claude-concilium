@@ -1,0 +1,24 @@
+{
+  "name": "@claude-concilium/mcp-gemini",
+  "version": "1.0.0",
+  "description": "MCP server wrapping gemini-cli for non-interactive API calls via Google OAuth",
+  "main": "server.js",
+  "bin": {
+    "mcp-gemini": "./server.js"
+  },
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spyrae/claude-concilium",
+    "directory": "servers/mcp-gemini"
+  },
+  "keywords": ["mcp", "gemini", "google", "claude-code", "ai-concilium"],
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "zod": "^3.25.76"
+  }
+}

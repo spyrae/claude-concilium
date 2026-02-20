@@ -1,0 +1,15 @@
+# Minimal Codex config for fast, non-interactive queries.
+#
+# Place this at ~/.codex-minimal/config.toml
+# Then symlink your auth: ln -s ~/.codex/auth.json ~/.codex-minimal/auth.json
+#
+# Why separate config?
+# The default codex config loads ALL MCP servers on startup, which is slow.
+# This minimal config has zero MCP servers, so `codex exec` starts instantly.
+
+model = "o3"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+instructions = "You are a senior software engineer consultant. Answer questions concisely and precisely. Focus on code quality, architecture, and reliability. Respond in the same language as the question."
+
+# No MCP servers = instant startup for non-interactive queries
