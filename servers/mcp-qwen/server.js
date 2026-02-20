@@ -55,6 +55,8 @@ function detectError(output) {
   return null;
 }
 
+const MAX_BUFFER = 10 * 1024 * 1024; // 10MB stdout/stderr limit
+
 /**
  * Run qwen CLI with timeout and proper SIGTERM/SIGKILL cleanup.
  * Uses spawn() instead of exec() for safety and reliability.
@@ -77,27 +79,37 @@ function runQwen(prompt, options = {}) {
     let stdout = "";
     let stderr = "";
     let killed = false;
+    let killTimer;
 
     const timer = setTimeout(() => {
       killed = true;
       proc.kill("SIGTERM");
-      setTimeout(() => {
+      killTimer = setTimeout(() => {
         try { if (!proc.killed) proc.kill("SIGKILL"); } catch {}
       }, 5000);
     }, timeoutMs);
 
     proc.stdout.on("data", (data) => {
       stdout += data.toString();
+      if (stdout.length > MAX_BUFFER) {
+        killed = true;
+        proc.kill("SIGTERM");
+      }
     });
 
     proc.stderr.on("data", (data) => {
       stderr += data.toString();
+      if (stderr.length > MAX_BUFFER) {
+        killed = true;
+        proc.kill("SIGTERM");
+      }
     });
 
     proc.stdin.end();
 
     proc.on("close", (exitCode) => {
       clearTimeout(timer);
+      clearTimeout(killTimer);
       if (killed) {
         reject(new Error(`Qwen killed after ${timeoutMs / 1000}s timeout. Partial: ${stdout.slice(-200)}`));
       } else {
@@ -107,6 +119,7 @@ function runQwen(prompt, options = {}) {
 
     proc.on("error", (err) => {
       clearTimeout(timer);
+      clearTimeout(killTimer);
       reject(err);
     });
   });
@@ -198,5 +211,10 @@ async function main() {
   await mcpServer.connect(transport);
   log("Started and ready");
 }
+
+process.on("SIGTERM", () => {
+  log("Shutting down...");
+  mcpServer.close().finally(() => process.exit(0));
+});
 
 main().catch(console.error);

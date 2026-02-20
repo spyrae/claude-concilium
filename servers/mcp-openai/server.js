@@ -107,6 +107,8 @@ function extractResponse(stdout, outputFileContent) {
  * Run codex CLI with timeout and proper cleanup.
  * Uses CODEX_HOME for minimal config (no MCP servers = fast startup).
  */
+const MAX_BUFFER = 10 * 1024 * 1024; // 10MB stdout/stderr limit
+
 function runCodex(args, options = {}) {
   const { timeoutMs = 90000, stdin: stdinData, cwd } = options;
 
@@ -123,21 +125,30 @@ function runCodex(args, options = {}) {
     let stdout = "";
     let stderr = "";
     let killed = false;
+    let killTimer;
 
     const timer = setTimeout(() => {
       killed = true;
       proc.kill("SIGTERM");
-      setTimeout(() => {
+      killTimer = setTimeout(() => {
         try { if (!proc.killed) proc.kill("SIGKILL"); } catch {}
       }, 5000);
     }, timeoutMs);
 
     proc.stdout.on("data", (data) => {
       stdout += data.toString();
+      if (stdout.length > MAX_BUFFER) {
+        killed = true;
+        proc.kill("SIGTERM");
+      }
     });
 
     proc.stderr.on("data", (data) => {
       stderr += data.toString();
+      if (stderr.length > MAX_BUFFER) {
+        killed = true;
+        proc.kill("SIGTERM");
+      }
     });
 
     if (stdinData) {
@@ -149,6 +160,7 @@ function runCodex(args, options = {}) {
 
     proc.on("close", (exitCode) => {
       clearTimeout(timer);
+      clearTimeout(killTimer);
       if (killed) {
         reject(new Error(`Process killed after ${timeoutMs / 1000}s timeout. Partial output: ${(stdout + stderr).slice(-200)}`));
       } else {
@@ -158,6 +170,7 @@ function runCodex(args, options = {}) {
 
     proc.on("error", (err) => {
       clearTimeout(timer);
+      clearTimeout(killTimer);
       reject(err);
     });
   });
@@ -377,5 +390,10 @@ async function main() {
   await mcpServer.connect(transport);
   log("Started and ready");
 }
+
+process.on("SIGTERM", () => {
+  log("Shutting down...");
+  mcpServer.close().finally(() => process.exit(0));
+});
 
 main().catch(console.error);
