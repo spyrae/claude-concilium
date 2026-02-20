@@ -1,6 +1,6 @@
 {
   "name": "@claude-concilium/mcp-openai",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "MCP server wrapping OpenAI Codex CLI for non-interactive API calls with error detection",
   "main": "server.js",
   "bin": {

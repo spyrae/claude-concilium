@@ -1,6 +1,6 @@
 {
   "name": "@claude-concilium/mcp-qwen",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "MCP server wrapping Qwen CLI with spawn-based execution, error detection, and timeout handling",
   "main": "server.js",
   "bin": {
