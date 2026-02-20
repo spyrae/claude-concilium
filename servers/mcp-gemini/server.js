@@ -11,7 +11,7 @@
  *   - Proper timeout with SIGTERM/SIGKILL cleanup
  *
  * Prerequisites:
- *   - Gemini CLI installed: npm install -g @anthropic-ai/gemini-cli (or brew)
+ *   - Gemini CLI installed: npm install -g @google/gemini-cli (or brew)
  *   - Authenticated: run `gemini` in terminal to login via Google
  */
 
