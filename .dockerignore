@@ -1,0 +1,14 @@
+node_modules/
+.git/
+.DS_Store
+*.log
+npm-debug.log*
+.env
+.env.*
+auth.json
+*.auth
+.codex/
+.codex-minimal/
+.idea/
+.vscode/
+marketing/

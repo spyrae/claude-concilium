@@ -196,6 +196,33 @@ Fallback 2: DeepSeek ───────────► Response (always avail
 | Performance optimization | Gemini (1M context) + OpenAI |
 | Security review | OpenAI + Gemini + manual verification |
 
+## Docker
+
+Run any server in a container:
+
+```bash
+# Build
+docker build -t claude-concilium .
+
+# Run a specific server (mcp-openai | mcp-gemini | mcp-qwen)
+docker run -i --rm -e SERVER=mcp-openai claude-concilium
+docker run -i --rm -e SERVER=mcp-gemini claude-concilium
+```
+
+**Note:** The servers wrap CLI tools (`codex`, `gemini`, `qwen`) that require local authentication. Mount your auth credentials when running:
+
+```bash
+# OpenAI (Codex)
+docker run -i --rm -e SERVER=mcp-openai \
+  -v ~/.codex:/root/.codex:ro \
+  claude-concilium
+
+# Gemini
+docker run -i --rm -e SERVER=mcp-gemini \
+  -v ~/.config/gemini:/root/.config/gemini:ro \
+  claude-concilium
+```
+
 ## Customization
 
 See [docs/customization.md](docs/customization.md) for:
