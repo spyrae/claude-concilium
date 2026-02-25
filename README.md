@@ -6,6 +6,10 @@
 [![Servers](https://img.shields.io/badge/MCP_Servers-3-orange.svg)](#mcp-servers)
 [![Smoke Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#quickstart)
 
+<a href="https://glama.ai/mcp/servers/@spyrae/claude-concilium">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@spyrae/claude-concilium/badge" alt="Claude Concilium MCP server" />
+</a>
+
 **Multi-agent AI consultation framework for Claude Code via MCP.**
 
 Get a second (and third) opinion from other LLMs when Claude Code alone isn't enough.
