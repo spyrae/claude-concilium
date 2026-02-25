@@ -1,7 +1,7 @@
 # Claude Concilium
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js 18+](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org/)
+[![Node.js 20+](https://img.shields.io/badge/node-20%2B-brightgreen.svg)](https://nodejs.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-blue.svg)](https://modelcontextprotocol.io/)
 [![Servers](https://img.shields.io/badge/MCP_Servers-3-orange.svg)](#mcp-servers)
 [![Smoke Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#quickstart)
