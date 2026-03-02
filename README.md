@@ -4,6 +4,7 @@
 [![Node.js 20+](https://img.shields.io/badge/node-20%2B-brightgreen.svg)](https://nodejs.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-blue.svg)](https://modelcontextprotocol.io/)
 [![Servers](https://img.shields.io/badge/MCP_Servers-3-orange.svg)](#mcp-servers)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](#changelog)
 [![Smoke Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#quickstart)
 
 <a href="https://glama.ai/mcp/servers/@spyrae/claude-concilium">
@@ -99,7 +100,7 @@ Pick at least 2 providers:
 |----------|------|-----------|-------|
 | **OpenAI** | `codex login` (OAuth) | ChatGPT Plus weekly credits | [Setup guide](docs/setup-openai.md) |
 | **Gemini** | Google OAuth | 1000 req/day | [Setup guide](docs/setup-gemini.md) |
-| **Qwen** | `qwen login` or API key | Varies | [Setup guide](docs/setup-qwen.md) |
+| **Qwen** | OAuth or API key | Varies | [Setup guide](docs/setup-qwen.md) |
 | **DeepSeek** | API key | Pay-per-use (cheap) | [Setup guide](docs/setup-deepseek.md) |
 
 ### 3. Add to Claude Code
@@ -152,7 +153,7 @@ Each server can be used independently — you don't need all of them.
 |--------|----------|------|-------|
 | [mcp-openai](servers/mcp-openai/) | `codex` | OAuth (ChatGPT Plus) | `openai_chat`, `openai_review` |
 | [mcp-gemini](servers/mcp-gemini/) | `gemini` | Google OAuth | `gemini_chat`, `gemini_analyze` |
-| [mcp-qwen](servers/mcp-qwen/) | `qwen` | API key / CLI login | `qwen_chat` |
+| [mcp-qwen](servers/mcp-qwen/) | `qwen` | OAuth / API key | `qwen_chat` |
 
 **DeepSeek** uses the existing [`deepseek-mcp-server`](https://www.npmjs.com/package/deepseek-mcp-server) npm package — no custom server needed.
 
@@ -175,6 +176,7 @@ All servers detect provider-specific errors and return structured responses:
 |------------|---------|--------|
 | `QUOTA_EXCEEDED` | Rate/credit limit hit | Use fallback provider |
 | `AUTH_EXPIRED` / `AUTH_REQUIRED` | Token needs refresh | Re-authenticate CLI |
+| `AUTH_NOT_CONFIGURED` | Qwen auth type not set | Set `QWEN_AUTH_TYPE` env var |
 | `MODEL_NOT_SUPPORTED` | Model unavailable on plan | Use default model |
 | Timeout | Process hung | Auto-killed, use fallback |
 
@@ -243,6 +245,30 @@ See [docs/customization.md](docs/customization.md) for:
 - [Qwen Setup](docs/setup-qwen.md) — Qwen CLI, DashScope
 - [DeepSeek Setup](docs/setup-deepseek.md) — API key, npm package
 - [Customization](docs/customization.md) — add your own LLM, modify chains
+
+## Changelog
+
+### v2.0.0 (2026-03-02)
+
+**mcp-qwen:**
+- Prompt delivery via stdin (`-p -`) instead of command argument — safe for any content, no length limits
+- OAuth auth-type support via `QWEN_AUTH_TYPE` env var (e.g., `qwen-oauth`)
+- New error detection: `AUTH_NOT_CONFIGURED` (catches "no auth type is selected")
+- Graceful shutdown handler (SIGTERM)
+
+**mcp-openai:**
+- Default timeout increased from 90s to 180s (codex exec can be slow on complex prompts)
+
+**All servers:**
+- Version bumped to 2.0.0
+- Updated documentation and setup guides
+
+### v0.1.0 (2025-12-15)
+
+- Initial release with 3 MCP servers (OpenAI, Gemini, Qwen)
+- Concilium skill with fallback chains
+- Smoke test suite
+- Docker support
 
 ## License
 

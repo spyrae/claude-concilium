@@ -2,21 +2,27 @@
 /**
  * MCP server wrapping Qwen CLI for reliable non-interactive API calls.
  *
- * Key improvements over naive exec() approach:
- *   1. Uses spawn() instead of exec() — no shell injection risk
- *   2. Proper SIGTERM/SIGKILL timeout pattern
- *   3. Error detection for quota/auth/timeout issues
- *   4. Structured error responses
+ * v2.0 improvements:
+ *   1. Prompt via stdin (-p -) — safe for any content, no length limits
+ *   2. --auth-type support via QWEN_AUTH_TYPE env var (e.g., "qwen-oauth")
+ *   3. Detects "no auth type is selected" error
+ *   4. spawn() with proper SIGTERM/SIGKILL timeout pattern
+ *   5. MAX_BUFFER protection against runaway output
  *
  * Prerequisites:
  *   - Qwen CLI installed: npm install -g qwen
- *   - Authenticated: qwen login (or DASHSCOPE_API_KEY env var)
+ *   - Authenticated: one of:
+ *     a) qwen login (interactive OAuth)
+ *     b) Set QWEN_AUTH_TYPE=qwen-oauth (if already authenticated)
+ *     c) Set DASHSCOPE_API_KEY env var (API key auth)
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { spawn } from "child_process";
+
+const QWEN_AUTH_TYPE = process.env.QWEN_AUTH_TYPE || "";
 
 function log(msg) {
   console.error(`[Qwen MCP] ${msg}`);
@@ -28,27 +34,35 @@ function log(msg) {
 function detectError(output) {
   const text = output.toLowerCase();
 
-  if (text.includes("quota") || text.includes("rate limit") || text.includes("insufficient_quota")) {
+  if (text.includes("no auth type is selected") || text.includes("please configure an auth type")) {
+    return {
+      isError: true,
+      errorType: "AUTH_NOT_CONFIGURED",
+      message: "Qwen auth type not configured. Set QWEN_AUTH_TYPE env var (e.g., 'qwen-oauth') or run 'qwen' interactively to login.",
+    };
+  }
+
+  if (text.includes("quota") || text.includes("rate limit") || text.includes("insufficient_quota") || text.includes("resource_exhausted")) {
     return {
       isError: true,
       errorType: "QUOTA_EXCEEDED",
-      message: "Qwen API quota exceeded. Check your DashScope account limits.",
+      message: "Qwen quota exceeded. Check your account limits or try again later.",
     };
   }
 
-  if (text.includes("authentication") || text.includes("invalid api key") || text.includes("unauthorized")) {
+  if (text.includes("authentication") || text.includes("invalid api key") || text.includes("unauthorized") || text.includes("token expired")) {
     return {
       isError: true,
-      errorType: "AUTH_ERROR",
-      message: "Qwen authentication failed. Run 'qwen login' or set DASHSCOPE_API_KEY env var.",
+      errorType: "AUTH_EXPIRED",
+      message: "Qwen authentication failed. Run 'qwen' in terminal to re-login, or check DASHSCOPE_API_KEY.",
     };
   }
 
-  if (text.includes("model not found") || text.includes("model_not_found")) {
+  if (text.includes("model not found") || text.includes("model_not_found") || text.includes("model is not available")) {
     return {
       isError: true,
-      errorType: "MODEL_NOT_FOUND",
-      message: "Qwen model not found. Available models: qwen-turbo, qwen-plus, qwen-long.",
+      errorType: "MODEL_NOT_AVAILABLE",
+      message: "Qwen model not found. Available: qwen-turbo, qwen-plus, qwen-long.",
     };
   }
 
@@ -59,13 +73,21 @@ const MAX_BUFFER = 10 * 1024 * 1024; // 10MB stdout/stderr limit
 
 /**
  * Run qwen CLI with timeout and proper SIGTERM/SIGKILL cleanup.
- * Uses spawn() instead of exec() for safety and reliability.
+ * Passes prompt via stdin (-p -) for safety and no length limits.
  */
 function runQwen(prompt, options = {}) {
   const { timeoutMs = 120000, model = "qwen-turbo" } = options;
 
   return new Promise((resolve, reject) => {
-    const args = ["-p", prompt];
+    const args = [];
+
+    // Pass --auth-type if configured via env var
+    if (QWEN_AUTH_TYPE) {
+      args.push("--auth-type", QWEN_AUTH_TYPE);
+    }
+
+    // Use stdin for prompt (-p -)
+    args.push("-p", "-");
 
     if (model && model !== "qwen-turbo") {
       args.push("-m", model);
@@ -105,6 +127,8 @@ function runQwen(prompt, options = {}) {
       }
     });
 
+    // Send prompt via stdin
+    proc.stdin.write(prompt);
     proc.stdin.end();
 
     proc.on("close", (exitCode) => {
@@ -129,14 +153,14 @@ function runQwen(prompt, options = {}) {
 
 const mcpServer = new McpServer({
   name: "qwen-mcp",
-  version: "1.0.0",
+  version: "2.0.0",
 });
 
 mcpServer.registerTool(
   "qwen_chat",
   {
     description:
-      "Send a prompt to Qwen via qwen CLI. Models: qwen-turbo (fast, default), qwen-plus (deep analysis, code review), qwen-long (large context). Good as fallback when OpenAI/Gemini are unavailable.",
+      "Send a prompt to Qwen via qwen CLI. Prompt sent via stdin (safe for any content). Models: qwen-turbo (fast, default), qwen-plus (deep analysis, code review), qwen-long (large context). Detects quota/auth errors.",
     inputSchema: {
       prompt: z.string().describe("The prompt to send to Qwen"),
       model: z
@@ -209,7 +233,7 @@ mcpServer.registerTool(
 async function main() {
   const transport = new StdioServerTransport();
   await mcpServer.connect(transport);
-  log("Started and ready");
+  log(`Started and ready (v2.0.0, auth-type: ${QWEN_AUTH_TYPE || "auto"})`);
 }
 
 process.on("SIGTERM", () => {

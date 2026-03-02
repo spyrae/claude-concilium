@@ -180,14 +180,14 @@ function runCodex(args, options = {}) {
 
 const mcpServer = new McpServer({
   name: "openai-mcp",
-  version: "1.0.0",
+  version: "2.0.0",
 });
 
 mcpServer.registerTool(
   "openai_chat",
   {
     description:
-      "Send a prompt to OpenAI via Codex exec. Non-interactive, fast startup (no MCP servers loaded), with timeout. Returns clear error on quota limits. For code review, use openai_review instead.",
+      "Send a prompt to OpenAI via Codex exec. Non-interactive, fast startup (no MCP servers loaded), 180s default timeout. Returns clear error on quota limits. For code review, use openai_review instead.",
     inputSchema: {
       prompt: z.string().describe("The prompt to send"),
       model: z
@@ -196,15 +196,15 @@ mcpServer.registerTool(
         .describe("Model override (optional). Note: some models may not be available on ChatGPT Plus"),
       timeout: z
         .number()
-        .default(90)
-        .describe("Timeout in seconds (default 90)"),
+        .default(180)
+        .describe("Timeout in seconds (default 180)"),
       cwd: z
         .string()
         .optional()
         .describe("Working directory for codex"),
     },
   },
-  async ({ prompt, model, timeout = 90, cwd }) => {
+  async ({ prompt, model, timeout = 180, cwd }) => {
     const timeoutMs = timeout * 1000;
     const outputFile = tempFile("codex-chat");
 

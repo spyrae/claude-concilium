@@ -1,6 +1,6 @@
 {
   "name": "@claude-concilium/mcp-gemini",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "description": "MCP server wrapping gemini-cli for non-interactive API calls via Google OAuth",
   "main": "server.js",
   "bin": {

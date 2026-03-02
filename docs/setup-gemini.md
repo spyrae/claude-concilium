@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - Google account
 
 ## Installation
@@ -10,7 +10,7 @@
 ### 1. Install Gemini CLI
 
 ```bash
-npm install -g @anthropic-ai/gemini-cli
+npm install -g @anthropic-ai/gemini-cli  # or @google/gemini-cli
 # or
 brew install gemini
 ```

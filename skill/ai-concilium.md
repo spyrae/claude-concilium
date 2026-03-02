@@ -193,12 +193,16 @@ mcp__gemini__gemini_analyze:
 mcp__qwen__qwen_chat:
   prompt: "Senior review: [diff/code]. Check reliability, errors, races."
   model: "qwen-plus"
+  timeout: 120
 
 # Large context:
 mcp__qwen__qwen_chat:
   prompt: "Analyze this large section: [code]."
   model: "qwen-long"
+  timeout: 120
 ```
+
+**Note:** Set `QWEN_AUTH_TYPE=qwen-oauth` in MCP config env for OAuth-based auth (no API key needed).
 
 ### DeepSeek (second fallback)
 
@@ -249,5 +253,7 @@ mcp__deepseek__chat_completion:
 | OpenAI: timeout | Process hung | Auto-killed; fallback → Qwen |
 | Gemini: `QUOTA_EXCEEDED` | 1000 req/day exhausted | Fallback → Qwen → DeepSeek |
 | Gemini: `AUTH_REQUIRED` | Google OAuth not set up | Run `gemini` in terminal to login |
+| Qwen: `AUTH_NOT_CONFIGURED` | selectedType missing in settings | Set `QWEN_AUTH_TYPE=qwen-oauth` in MCP config env |
+| Qwen: `AUTH_EXPIRED` | OAuth token expired | Run `qwen` interactively to re-login |
 | Qwen: timeout | CLI not responding | Fallback → DeepSeek |
 | All agents unavailable | Network issues | Wait, check internet |

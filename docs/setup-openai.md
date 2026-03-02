@@ -67,7 +67,7 @@ Send a prompt via `codex exec`. Non-interactive, fast startup.
 Parameters:
 - `prompt` (required) — the prompt to send
 - `model` (optional) — model override
-- `timeout` (optional, default 90) — timeout in seconds
+- `timeout` (optional, default 180) — timeout in seconds
 - `cwd` (optional) — working directory
 
 ### `openai_review`

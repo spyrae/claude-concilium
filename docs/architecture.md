@@ -97,9 +97,10 @@ Each MCP server implements `detectError(output)` that checks CLI output for know
 
 ### Qwen (`mcp-qwen`)
 ```
+"no auth type is selected"                     → AUTH_NOT_CONFIGURED
 "quota" / "rate limit" / "insufficient_quota"  → QUOTA_EXCEEDED
-"authentication" / "invalid api key"           → AUTH_ERROR
-"model not found" / "model_not_found"          → MODEL_NOT_FOUND
+"authentication" / "invalid api key"           → AUTH_EXPIRED
+"model not found" / "model is not available"   → MODEL_NOT_AVAILABLE
 ```
 
 ## Timeout Handling
@@ -125,7 +126,7 @@ proc.on("close", () => {
 ```
 
 Default timeouts:
-- `openai_chat`: 90s
+- `openai_chat`: 180s
 - `openai_review`: 120s
 - `gemini_chat`: 90s
 - `gemini_analyze`: 180s

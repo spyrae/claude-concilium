@@ -4,7 +4,7 @@ DeepSeek uses the existing [`deepseek-mcp-server`](https://www.npmjs.com/package
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - DeepSeek API key ([platform.deepseek.com](https://platform.deepseek.com))
 
 ## Installation

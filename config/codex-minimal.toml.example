@@ -7,9 +7,11 @@
 # The default codex config loads ALL MCP servers on startup, which is slow.
 # This minimal config has zero MCP servers, so `codex exec` starts instantly.
 
-model = "o3"
 model_reasoning_effort = "high"
 personality = "pragmatic"
 instructions = "You are a senior software engineer consultant. Answer questions concisely and precisely. Focus on code quality, architecture, and reliability. Respond in the same language as the question."
+
+# Uncomment to pin a specific model (default is determined by your plan):
+# model = "o3"
 
 # No MCP servers = instant startup for non-interactive queries
